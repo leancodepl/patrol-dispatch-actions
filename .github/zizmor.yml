@@ -1,0 +1,7 @@
+rules:
+  unpinned-uses:
+    config:
+      # `.github/workflows/actions.lock` holds the commit of each tag the workflows name, and CI
+      # fails when the lockfile falls out of sync with the workflows.
+      policies:
+        "*": ref-pin

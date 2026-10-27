@@ -1,0 +1,14 @@
+# A release must be public for 30 days before it is proposed, so a compromised
+# version is usually yanked before it reaches a pull request. Security updates
+# ignore the cooldown.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 30
+    commit-message:
+      prefix: chore
+      include: scope

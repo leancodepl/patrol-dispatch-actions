@@ -1,0 +1,59 @@
+name: Patrol Dispatch create build
+description: >-
+  Build the app in develop mode and keep the build with Dispatch, unless a kept
+  build already fits the checkout. Place it after your toolchain steps in
+  `.github/workflows/patrol-dispatch-build.yml` on the default branch, with
+  `id-token: write`.
+
+inputs:
+  control-plane-url:
+    description: The Dispatch control plane, as an origin with no path.
+    required: false
+    default: https://control-plane-775029643966.europe-west1.run.app
+  dart-defines:
+    description: >-
+      JSON object of --dart-define values for the app under test. Baked into the
+      build and recorded with the upload, so Dispatch restarts the app with the
+      same values.
+    required: false
+  dart-defines-file:
+    description: >-
+      The same as dart-defines, read from a file instead: a JSON object of
+      strings or a .env file of KEY=VALUE lines, relative to the workspace, for
+      example `app/.env`. Set dart-defines or this, not both.
+    required: false
+  force:
+    description: Build even when a kept build already fits the checkout.
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Install the Dispatch CLI
+      shell: bash
+      env:
+        PATROL_DISPATCH_API_URL: ${{ inputs.control-plane-url }}
+      # Downloaded before it runs, so a download cut short runs nothing.
+      run: |
+        set -euo pipefail
+        script="$RUNNER_TEMP/patrol-dispatch-install-cli.sh"
+        curl -fsS --proto '=https' -o "$script" "$PATROL_DISPATCH_API_URL/v1/cli/install"
+        bash "$script"
+
+    - name: Stage the app-under-test dart-defines
+      shell: bash
+      env:
+        DART_DEFINES: ${{ inputs.dart-defines }}
+        DART_DEFINES_FILE: ${{ inputs.dart-defines-file }}
+      run: bash "${{ github.action_path }}/stage-dart-defines.sh"
+
+    - name: Build and keep the develop build
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        FORCE: ${{ inputs.force }}
+      run: |
+        force=()
+        [[ "$FORCE" == "true" ]] && force=(--force)
+        patrol-dispatch build ensure "${force[@]}"
