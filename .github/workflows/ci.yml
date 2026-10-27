@@ -15,7 +15,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: >-
@@ -29,7 +29,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       # The token turns on the online audits, such as an action version with a
@@ -41,13 +41,28 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+  actions-lock:
+    name: actions-lock
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - run: |
+          gh extension install github/gh-actions-lock --pin v0.3.0
+          gh actions-lock --verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   shellcheck:
     name: shellcheck
     runs-on: ubuntu-latest
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
       - run: >-
