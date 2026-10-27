@@ -50,7 +50,7 @@ the CLI reaches you without a new version of the action.
 ## Releasing
 
 1. Open a pull request that moves the `Unreleased` entries in `CHANGELOG.md` under
-   `## [0.y.z] - <date>`, and merge it.
+   `## [0.y.z] - <date>` and updates the links at the bottom of the file. Merge it.
 2. Publish the release from the merge commit:
 
    ```bash
